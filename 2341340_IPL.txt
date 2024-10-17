@@ -1,0 +1,385 @@
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| employee           |
+| hospital_data      |
+| information_schema |
+| IPL                |
+| medicalcare        |
+| medicine           |
+| mysql              |
+| patient_data       |
+| performance_schema |
++--------------------+
+9 rows in set (0.00 sec)
+
+mysql> use IPL;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> -- Create Teams table
+mysql> CREATE TABLE Teams (
+    ->     Team_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Team_Name VARCHAR(100) NOT NULL,
+    ->     Home_City VARCHAR(100) NOT NULL
+    -> );
+ERROR 1050 (42S01): Table 'teams' already exists
+mysql> 
+mysql> -- Create Players table
+mysql> CREATE TABLE Players (
+    ->     Player_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Player_Name VARCHAR(100) NOT NULL,
+    ->     Age INT NOT NULL,
+    ->     Team_ID INT,
+    ->     FOREIGN KEY (Team_ID) REFERENCES Teams(Team_ID)
+    -> );
+ERROR 1050 (42S01): Table 'players' already exists
+mysql> 
+mysql> -- Create Matches table
+mysql> CREATE TABLE Matches (
+    ->     Match_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Match_Date DATE NOT NULL,
+    ->     Venue VARCHAR(100) NOT NULL,
+    ->     Team1_ID INT,
+    ->     Team2_ID INT,
+    ->     FOREIGN KEY (Team1_ID) REFERENCES Teams(Team_ID),
+    ->     FOREIGN KEY (Team2_ID) REFERENCES Teams(Team_ID)
+    -> );
+ERROR 1050 (42S01): Table 'matches' already exists
+mysql> 
+mysql> -- Create Performance table
+mysql> CREATE TABLE Performance (
+    ->     Performance_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Player_ID INT,
+    ->     Match_ID INT,
+    ->     Runs_Scored INT NOT NULL,
+    ->     Wickets_Taken INT NOT NULL,
+    ->     FOREIGN KEY (Player_ID) REFERENCES Players(Player_ID),
+    ->     FOREIGN KEY (Match_ID) REFERENCES Matches(Match_ID)
+    -> );
+ERROR 1050 (42S01): Table 'performance' already exists
+mysql> drop database IPL;
+Query OK, 6 rows affected (0.03 sec)
+
+mysql> create database IPL;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> use IPL;
+Database changed
+mysql> -- Create Teams table
+mysql> CREATE TABLE Teams (
+    ->     Team_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Team_Name VARCHAR(100) NOT NULL,
+    ->     Home_City VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> -- Create Players table
+mysql> CREATE TABLE Players (
+    ->     Player_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Player_Name VARCHAR(100) NOT NULL,
+    ->     Age INT NOT NULL,
+    ->     Team_ID INT,
+    ->     FOREIGN KEY (Team_ID) REFERENCES Teams(Team_ID)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> -- Create Matches table
+mysql> CREATE TABLE Matches (
+    ->     Match_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Match_Date DATE NOT NULL,
+    ->     Venue VARCHAR(100) NOT NULL,
+    ->     Team1_ID INT,
+    ->     Team2_ID INT,
+    ->     FOREIGN KEY (Team1_ID) REFERENCES Teams(Team_ID),
+    ->     FOREIGN KEY (Team2_ID) REFERENCES Teams(Team_ID)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> -- Create Performance table
+mysql> CREATE TABLE Performance (
+    ->     Performance_ID INT PRIMARY KEY AUTO_INCREMENT,
+    ->     Player_ID INT,
+    ->     Match_ID INT,
+    ->     Runs_Scored INT NOT NULL,
+    ->     Wickets_Taken INT NOT NULL,
+    ->     FOREIGN KEY (Player_ID) REFERENCES Players(Player_ID),
+    ->     FOREIGN KEY (Match_ID) REFERENCES Matches(Match_ID)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> -- Insert into Teams table (without specifying Team_ID)
+mysql> INSERT INTO Teams (Team_Name, Home_City)
+    -> VALUES 
+    -> ('Mumbai Indians', 'Mumbai'),
+    -> ('Chennai Super Kings', 'Chennai'),
+    -> ('Royal Challengers Bangalore', 'Bangalore'),
+    -> ('Delhi Capitals', 'Delhi'),
+    -> ('Kolkata Knight Riders', 'Kolkata');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- Insert into Players table (without specifying Player_ID)
+mysql> INSERT INTO Players (Player_Name, Age, Team_ID)
+    -> VALUES 
+    -> ('Virat Kohli', 34, 3),  
+    -> ('Rohit Sharma', 36, 1), 
+    -> ('MS Dhoni', 42, 2),     
+    -> ('Rishabh Pant', 26, 4), 
+    -> ('Andre Russell', 35, 5);
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- Insert into Matches table (without specifying Match_ID)
+mysql> INSERT INTO Matches (Match_Date, Venue, Team1_ID, Team2_ID)
+    -> VALUES 
+    -> ('2024-05-10', 'Wankhede Stadium', 1, 3), 
+    -> ('2024-05-12', 'Chinnaswamy Stadium', 2, 1), 
+    -> ('2024-05-15', 'Feroz Shah Kotla', 4, 5), 
+    -> ('2024-05-18', 'Eden Gardens', 5, 3), 
+    -> ('2024-05-20', 'MA Chidambaram Stadium', 2, 4);
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> -- Insert into Performance table (without specifying Performance_ID)
+mysql> INSERT INTO Performance (Player_ID, Match_ID, Runs_Scored, Wickets_Taken)
+    -> VALUES
+    -> (1, 1, 80, 0), 
+    -> (2, 1, 60, 0), 
+    -> (3, 2, 50, 1), 
+    -> (4, 3, 75, 0), 
+    -> (5, 4, 100, 2);
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> -- Find the player with the longest name (String functions)
+mysql> SELECT Player_Name, LENGTH(Player_Name) AS Name_Length 
+    -> FROM Players 
+    -> ORDER BY Name_Length DESC LIMIT 1;
++---------------+-------------+
+| Player_Name   | Name_Length |
++---------------+-------------+
+| Andre Russell |          13 |
++---------------+-------------+
+1 row in set (0.01 sec)
+
+mysql> 
+mysql> -- Calculate the absolute value of the difference in runs between two performances
+mysql> SELECT ABS(p1.Runs_Scored - p2.Runs_Scored) AS Run_Difference
+    -> FROM Performance p1, Performance p2
+    -> WHERE p1.Player_ID = 1 AND p2.Player_ID = 2;
++----------------+
+| Run_Difference |
++----------------+
+|             20 |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- Aggregate Functions: Get total runs scored by all players
+mysql> SELECT SUM(Runs_Scored) AS Total_Runs FROM Performance;
++------------+
+| Total_Runs |
++------------+
+|        365 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- Average runs per player
+mysql> SELECT Player_ID, AVG(Runs_Scored) AS Avg_Runs
+    -> FROM Performance
+    -> GROUP BY Player_ID;
++-----------+----------+
+| Player_ID | Avg_Runs |
++-----------+----------+
+|         1 |  80.0000 |
+|         2 |  60.0000 |
+|         3 |  50.0000 |
+|         4 |  75.0000 |
+|         5 | 100.0000 |
++-----------+----------+
+5 rows in set (0.00 sec)
+
+mysql> -- Find players who scored more than 70 runs (WHERE clause)
+mysql> SELECT Player_Name 
+    -> FROM Players 
+    -> WHERE Player_ID IN (
+    ->     SELECT Player_ID 
+    ->     FROM Performance 
+    ->     WHERE Runs_Scored > 70
+    -> );
++---------------+
+| Player_Name   |
++---------------+
+| Virat Kohli   |
+| Rishabh Pant  |
+| Andre Russell |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- Group by clause: Total runs scored by each player
+mysql> SELECT Player_ID, SUM(Runs_Scored) AS Total_Runs 
+    -> FROM Performance 
+    -> GROUP BY Player_ID;
++-----------+------------+
+| Player_ID | Total_Runs |
++-----------+------------+
+|         1 |         80 |
+|         2 |         60 |
+|         3 |         50 |
+|         4 |         75 |
+|         5 |        100 |
++-----------+------------+
+5 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- HAVING clause: Show players with total runs over 100
+mysql> SELECT Player_ID, SUM(Runs_Scored) AS Total_Runs 
+    -> FROM Performance 
+    -> GROUP BY Player_ID 
+    -> HAVING Total_Runs > 100;
+Empty set (0.00 sec)
+
+mysql> 
+mysql> -- Order by clause: List players by total runs scored, in descending order
+mysql> SELECT Player_ID, SUM(Runs_Scored) AS Total_Runs 
+    -> FROM Performance 
+    -> GROUP BY Player_ID 
+    -> ORDER BY Total_Runs DESC;
++-----------+------------+
+| Player_ID | Total_Runs |
++-----------+------------+
+|         5 |        100 |
+|         1 |         80 |
+|         4 |         75 |
+|         2 |         60 |
+|         3 |         50 |
++-----------+------------+
+5 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- Distinct and Limit: Get distinct venues, limiting to 3
+mysql> SELECT DISTINCT Venue 
+    -> FROM Matches 
+    -> LIMIT 3;
++---------------------+
+| Venue               |
++---------------------+
+| Wankhede Stadium    |
+| Chinnaswamy Stadium |
+| Feroz Shah Kotla    |
++---------------------+
+3 rows in set (0.00 sec)
+
+mysql> -- Find players whose names start with 'R'
+mysql> SELECT Player_Name 
+    -> FROM Players 
+    -> WHERE Player_Name LIKE 'R%';
++--------------+
+| Player_Name  |
++--------------+
+| Rohit Sharma |
+| Rishabh Pant |
++--------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+mysql> -- Find venues containing 'Stadium'
+mysql> SELECT Venue 
+    -> FROM Matches 
+    -> WHERE Venue LIKE '%Stadium%';
++------------------------+
+| Venue                  |
++------------------------+
+| Wankhede Stadium       |
+| Chinnaswamy Stadium    |
+| MA Chidambaram Stadium |
++------------------------+
+3 rows in set (0.00 sec)
+
+mysql> -- Create a view for top performers
+mysql> CREATE VIEW Top_Performers AS
+    -> SELECT Player_Name, Runs_Scored 
+    -> FROM Players p
+    -> JOIN Performance pf ON p.Player_ID = pf.Player_ID
+    -> WHERE Runs_Scored > 70;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> -- Query the view
+mysql> SELECT * FROM Top_Performers;
++---------------+-------------+
+| Player_Name   | Runs_Scored |
++---------------+-------------+
+| Virat Kohli   |          80 |
+| Rishabh Pant  |          75 |
+| Andre Russell |         100 |
++---------------+-------------+
+3 rows in set (0.00 sec)
+
+mysql> -- Subquery: Find the player who scored the most runs in any match
+mysql> SELECT Player_Name 
+    -> FROM Players 
+    -> WHERE Player_ID = (
+    ->     SELECT Player_ID 
+    ->     FROM Performance 
+    ->     ORDER BY Runs_Scored DESC 
+    ->     LIMIT 1
+    -> );
++---------------+
+| Player_Name   |
++---------------+
+| Andre Russell |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> -- Nested Query: Find matches held in venues where 'Mumbai Indians' played
+mysql> SELECT Venue 
+    -> FROM Matches 
+    -> WHERE Team1_ID = (
+    ->     SELECT Team_ID FROM Teams WHERE Team_Name = 'Mumbai Indians'
+    -> );
++------------------+
+| Venue            |
++------------------+
+| Wankhede Stadium |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> -- Start a transaction to update the age of a player
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> -- Update a player's age
+mysql> UPDATE Players SET Age = 37 WHERE Player_ID = 2;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> 
+mysql> -- Commit the transaction
+mysql> COMMIT;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> -- Rollback example
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DELETE FROM Players WHERE Player_ID = 5;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`ipl`.`performance`, CONSTRAINT `performance_ibfk_1` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`Player_ID`))
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
